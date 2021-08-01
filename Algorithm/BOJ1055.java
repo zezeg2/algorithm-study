@@ -5,52 +5,57 @@ public class Main {
     static StringBuilder sb = new StringBuilder();
     static FastReader scan = new FastReader();
 
-    static int N, R, Q;
+    static int N, K;
+    static int[] indegree, T, Tdone;
     static ArrayList<Integer>[] adj;
-    static int[] V, parent;
-
 
     static void input() {
         N = scan.nextInt();
-        R = scan.nextInt();
-        Q = scan.nextInt();
+        K = scan.nextInt();
+        T = new int[N+1];
+        for (int i = 1; i <= N; i++){
+            T[i] = scan.nextInt();
+        }
+        Tdone = new int[N+1];
         adj = new ArrayList[N+1];
-        for (int i = 0; i <= N; i++) adj[i] = new ArrayList<>();
-        for (int i = 0; i < N; i++){
+        for (int i = 1; i <= N; i++){
+            adj[i] = new ArrayList<>();
+        }
+        indegree = new int[N+1];
+        for (int i = 0; i < K; i++){
             int u = scan.nextInt(), v = scan.nextInt();
             adj[u].add(v);
-            adj[v].add(u);
-        }
-
-        V = new int[N+1];
-        parent = new int[N + 1];
-    }
-
-    static void dfs(int x, int par){
-        if (adj[x].size() == 1){
-            V[x] = 1;
-//            parent[x] = adj[x].get(0);
-        }
-        for (int y : adj[x]){
-            if (y == par) continue;
-            parent[y] = x;
-            dfs(y, x);
-            V[x] += V[y];
+            indegree[v]++;
         }
     }
 
     static void pro(){
-        dfs(R, -1);
-        for (int i = 0; i < Q; i++){
-            int x  = scan.nextInt();
-            sb.append(V[x]).append('\n');
+        Deque<Integer> queue = new LinkedList<>();
+        for (int i = 1; i <= N; i++){
+            if (indegree[i] == 0){
+                queue.add(i);
+                Tdone[i] = T[i];
+            }
         }
-        System.out.println(sb);
+        while(!queue.isEmpty()){
+            int x = queue.poll();
+            for (int y : adj[x]){
+                indegree[y]--;
+                if(indegree[y] == 0) queue.add(y);
+                Tdone[y] = Math.max(Tdone[y],Tdone[x]+T[y]);
+            }
+        }
+        int W = scan.nextInt();
+        System.out.println(Tdone[W]);
+
     }
 
     public static void main(String[] args) {
-        input();
-        pro();
+        int TC = scan.nextInt();
+        for (int i = 0; i < TC; i++){
+            input();
+            pro();
+        }
     }
 
 
@@ -100,3 +105,5 @@ public class Main {
         }
     }
 }
+
+// 1516, 2056, 2637;
